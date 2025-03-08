@@ -1,0 +1,144 @@
+import java.util.HashMap;
+import java.util.Scanner;
+
+class Main {
+    
+    private static HashMap<String, String> users = new HashMap<>();
+    private static HashMap<String, Double> balances = new HashMap<>();
+    private static String loggedInUser = null;
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nATM System - Main Menu:");
+            System.out.println("1. Register");
+            System.out.println("2. Login");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    register(scanner);
+                    break;
+                case 2:
+                    login(scanner);
+                    break;
+                case 3:
+                    System.out.println("Exiting the ATM system. Goodbye!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    
+    public static void register(Scanner scanner) {
+        System.out.print("Enter a username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter a password: ");
+        String password = scanner.nextLine();
+
+        if (users.containsKey(username)) {
+            System.out.println("Username already exists! Please choose a different one.");
+        } else {
+            users.put(username, password);
+            balances.put(username, 1000.00); 
+            System.out.println("Registration successful! You can now log in.");
+        }
+    }
+
+    
+    public static void login(Scanner scanner) {
+        if (loggedInUser != null) {
+            System.out.println("You are already logged in as " + loggedInUser);
+            return;
+        }
+
+        System.out.print("Enter your username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter your password: ");
+        String password = scanner.nextLine();
+
+        if (users.containsKey(username) && users.get(username).equals(password)) {
+            loggedInUser = username;
+            System.out.println("Login successful! Welcome " + loggedInUser + ".");
+            showMenu(scanner);
+        } else {
+            System.out.println("Invalid username or password. Please try again.");
+        }
+    }
+
+    
+    public static void showMenu(Scanner scanner) {
+        int choice;
+
+        do {
+            System.out.println("\nATM Menu:");
+            System.out.println("1. Check Balance");
+            System.out.println("2. Deposit");
+            System.out.println("3. Withdraw");
+            System.out.println("4. Logout");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    checkBalance();
+                    break;
+                case 2:
+                    depositMoney(scanner);
+                    break;
+                case 3:
+                    withdrawMoney(scanner);
+                    break;
+                case 4:
+                    logout();
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 4);
+    }
+
+    
+    public static void checkBalance() {
+        System.out.println("Your current balance is: $" + balances.get(loggedInUser));
+    }
+
+    
+    public static void depositMoney(Scanner scanner) {
+        System.out.print("Enter the amount to deposit: $");
+        double depositAmount = scanner.nextDouble();
+        if (depositAmount > 0) {
+            balances.put(loggedInUser, balances.get(loggedInUser) + depositAmount);
+            System.out.println("You have successfully deposited: $" + depositAmount);
+            checkBalance();
+        } else {
+            System.out.println("Invalid deposit amount.");
+        }
+    }
+
+    
+    public static void withdrawMoney(Scanner scanner) {
+        System.out.print("Enter the amount to withdraw: $");
+        double withdrawAmount = scanner.nextDouble();
+        if (withdrawAmount > 0 && withdrawAmount <= balances.get(loggedInUser)) {
+            balances.put(loggedInUser, balances.get(loggedInUser) - withdrawAmount);
+            System.out.println("You have successfully withdrawn: $" + withdrawAmount);
+            checkBalance();
+        } else {
+            System.out.println("Invalid withdraw amount or insufficient balance.");
+        }
+    }
+
+    
+    public static void logout() {
+        System.out.println("You have logged out successfully.");
+        loggedInUser = null; // Set logged-in user to null
+    }
+}
